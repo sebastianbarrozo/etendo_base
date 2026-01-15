@@ -10,4 +10,4 @@
 !.run
 !.run/**
 !.github
-!.github/**
+!.github/**.env
