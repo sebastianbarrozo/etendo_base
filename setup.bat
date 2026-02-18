@@ -2,23 +2,42 @@
 :: setup.bat — Bootstrap script for Etendo (Windows)
 ::
 :: Flow:
-::   1. Require JAVA_HOME to be set
-::   2. If githubToken is missing -> run GitHub Device Flow auth (gradle\setup.java)
-::      Abort immediately if auth fails
-::   3. Always launch gradlew.bat setup.web (or the task passed as argument)
+::   1. Require JAVA_HOME
+::   2. If githubToken missing -> GitHub Device Flow auth; abort on failure
+::   3. Launch gradlew.bat setup.web (always — Gradle task handles resumption)
+::
+:: State file: .setup-progress
+::   Tracks completed phases so re-runs can continue from where they stopped.
+::   Phases: auth | setup.web
+::   Delete .setup-progress to start over.
 ::
 :: Usage:
-::   setup.bat               runs setup.web (default)
-::   setup.bat <task>        runs any gradle task
+::   setup.bat               auto-detect last step and continue
+::   setup.bat --fresh       reset progress and start from scratch
+::   setup.bat <task>        run a specific gradle task directly
 
 setlocal enabledelayedexpansion
+
+set "STATE_FILE=.setup-progress"
+set "PROPS_FILE=gradle.properties"
+
+:: ── --fresh: reset state ──────────────────────────────────────────────────────
+if /i "%~1"=="--fresh" (
+    if exist "%STATE_FILE%" del /f "%STATE_FILE%"
+    powershell -Command "(Get-Content '%PROPS_FILE%') -replace '^githubToken=.*','githubToken=' | Set-Content '%PROPS_FILE%'" 2>nul
+    echo Progress reset. Starting fresh.
+    call "%~f0"
+    exit /b %ERRORLEVEL%
+)
 
 set "TASK=%~1"
 if "%TASK%"=="" set "TASK=setup.web"
 
-set "PROPS_FILE=gradle.properties"
+:: ── Helpers ───────────────────────────────────────────────────────────────────
+:: phase_done: check if phase is marked done in state file
+:: mark_done:  append phase=done to state file if not already there
 
-:: ── 1. Require JAVA_HOME ─────────────────────────────────────────────────────
+:: ── 1. Require JAVA_HOME ──────────────────────────────────────────────────────
 if not defined JAVA_HOME (
     echo.
     echo ERROR: JAVA_HOME is not set.
@@ -37,7 +56,7 @@ if not exist "%JAVA_CMD%" (
     exit /b 1
 )
 
-:: ── 2. GitHub auth if token not set ──────────────────────────────────────────
+:: ── 2. Auth phase ─────────────────────────────────────────────────────────────
 set "EXISTING="
 for /f "tokens=1* delims==" %%A in ('findstr /r /c:"^githubToken=." "%PROPS_FILE%" 2^>nul') do (
     set "EXISTING=%%B"
@@ -53,7 +72,12 @@ if "!EXISTING!"=="" (
         exit /b 1
     )
 )
+findstr /c:"auth=done" "%STATE_FILE%" >nul 2>&1 || echo auth=done>>"%STATE_FILE%"
 
-:: ── 3. Always launch Gradle ───────────────────────────────────────────────────
+:: ── 3. Gradle phase ───────────────────────────────────────────────────────────
+:: Always launch Gradle — it handles incremental execution internally.
+:: If setup.web previously failed (e.g. at Tomcat), re-running this script
+:: skips auth (token already saved) and re-enters setup.web from the last
+:: checkpoint tracked by the Gradle task itself.
 call gradlew.bat %TASK%
 exit /b %ERRORLEVEL%
