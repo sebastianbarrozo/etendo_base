@@ -313,229 +313,293 @@ public class setup {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Etendo Setup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --surface: #ffffff;
+    --text-primary: #0b0c10;
+    --text-secondary: #475467;
+    --border-color: #e4e7ec;
+    --background-main: #f5f6fa;
+    --primary-color: #004aca;
+    --primary-dark: #003494;
+    --primary-light: #e3f2fd;
+    --success: #4caf50;
+    --error: #f44336;
+    --sidebar-width: 260px;
+  }
   body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background: #f5f6fa;
-    color: #1a1a2e;
+    background: var(--background-main);
+    color: var(--text-primary);
+    margin: 0;
+  }
+  .app-layout {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
     min-height: 100vh;
   }
-  .header {
-    margin-bottom: 32px;
-    text-align: center;
+  /* ---- Sidebar ---- */
+  .sidebar {
+    width: var(--sidebar-width);
+    min-width: var(--sidebar-width);
+    height: 100vh;
+    position: fixed;
+    left: 0; top: 0;
+    background: var(--surface);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
   }
-  .logo {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 4px;
-  }
-  .logo-icon {
-    width: 36px;
-    height: 36px;
-    background: #004aca;
-    border-radius: 8px;
+  .sidebar-header { padding: 24px 20px 16px; }
+  .sidebar-title { font-size: 16px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.01em; }
+  .sidebar-subtitle { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+  .sidebar-divider { height: 1px; background: var(--border-color); margin: 0 0 8px; }
+  .sidebar-nav { padding: 0 8px; flex: 1; }
+  .nav-item {
     display: flex;
     align-items: center;
-    justify-content: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    margin-bottom: 2px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: default;
+    user-select: none;
   }
-  .logo-title {
-    font-size: 20px;
-    font-weight: 700;
-    color: #004aca;
-    letter-spacing: 0.5px;
+  .nav-item.active {
+    background: var(--primary-color);
+    color: #ffffff;
   }
-  .logo-subtitle {
+  .nav-item.active .nav-icon svg { stroke: #ffffff; }
+  .nav-item-label { display: flex; flex-direction: column; gap: 1px; }
+  .nav-item-desc { font-size: 11px; font-weight: 400; opacity: 0.75; }
+  .nav-icon { width: 20px; height: 20px; flex-shrink: 0; }
+  .sidebar-footer {
+    padding: 16px 20px;
+    border-top: 1px solid var(--border-color);
     font-size: 12px;
-    color: #6b7280;
-    margin-top: 2px;
+    color: var(--text-secondary);
   }
-  .card {
-    background: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.08), 0 4px 16px rgba(0,74,202,0.06);
-    padding: 40px 48px;
-    max-width: 460px;
-    width: 90%;
-    text-align: center;
+  /* ---- Main content ---- */
+  .main-content {
+    margin-left: var(--sidebar-width);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 32px;
   }
-  .step-label {
-    display: inline-block;
-    background: #e3f2fd;
-    color: #004aca;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    border-radius: 20px;
-    padding: 3px 12px;
-    margin-bottom: 16px;
+  /* ---- Auth card (mirrors .status-card) ---- */
+  .auth-card {
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 32px;
+    background: var(--surface);
+    box-shadow: 0 18px 48px rgba(15,23,42,0.08);
+    max-width: 540px;
   }
-  h1 {
+  .section-title {
     font-size: 22px;
     font-weight: 700;
-    color: #111827;
-    margin-bottom: 8px;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
   }
-  .subtitle {
-    color: #6b7280;
+  .section-subtitle {
     font-size: 14px;
+    color: var(--text-secondary);
     line-height: 1.5;
-    margin-bottom: 28px;
+    margin-bottom: 24px;
   }
-  .divider {
-    height: 1px;
-    background: #f0f0f5;
-    margin: 0 -48px 28px;
+  .card-divider { height: 1px; background: var(--border-color); margin: 0 0 24px; }
+  .step-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 20px;
   }
-  .instruction {
-    font-size: 13px;
-    color: #6b7280;
-    margin-bottom: 10px;
+  .step-num {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: var(--primary-light);
+    color: var(--primary-color);
+    font-size: 12px;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
   }
-  .url-chip {
-    display: inline-block;
-    background: #e3f2fd;
-    color: #004aca;
+  .step-body { flex: 1; }
+  .step-label { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px; }
+  .url-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--primary-color);
     font-size: 13px;
     font-weight: 500;
-    border-radius: 6px;
-    padding: 5px 14px;
-    margin-bottom: 20px;
     text-decoration: none;
-    border: 1px solid #bbdefb;
+    padding: 4px 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--background-main);
+    transition: background 0.15s;
   }
-  .url-chip:hover { background: #bbdefb; }
+  .url-link:hover { background: var(--primary-light); border-color: var(--primary-color); }
   .code-box {
-    background: #f5f6fa;
-    border: 2px solid #004aca;
+    background: var(--background-main);
+    border: 2px solid var(--primary-color);
     border-radius: 8px;
-    padding: 18px 20px;
-    margin: 0 0 8px;
+    padding: 16px 20px;
     font-family: 'SF Mono', 'Fira Code', Menlo, Consolas, monospace;
-    font-size: 30px;
+    font-size: 28px;
     font-weight: 700;
     letter-spacing: 6px;
-    color: #004aca;
+    color: var(--primary-color);
     user-select: all;
+    display: inline-block;
+    margin-bottom: 6px;
   }
   .copied {
     font-size: 12px;
-    color: #4caf50;
-    margin-bottom: 20px;
+    color: var(--success);
     height: 16px;
     opacity: 0;
     transition: opacity 0.2s;
+    margin-bottom: 16px;
   }
   .copied.show { opacity: 1; }
-  .buttons {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    margin-bottom: 28px;
-  }
+  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
   .btn {
-    padding: 9px 20px;
+    padding: 8px 18px;
     border-radius: 8px;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
+    font-family: inherit;
     cursor: pointer;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
     gap: 6px;
     transition: background 0.15s, box-shadow 0.15s;
-    border: none;
+    border: 1px solid var(--border-color);
     outline: none;
+    line-height: 1.4;
   }
-  .btn-primary {
-    background: #004aca;
-    color: #fff;
-    box-shadow: 0 2px 6px rgba(0,74,202,0.25);
+  .btn-outlined {
+    background: var(--surface);
+    color: var(--text-primary);
   }
-  .btn-primary:hover { background: #003494; box-shadow: 0 4px 10px rgba(0,74,202,0.3); }
-  .btn-secondary {
-    background: #ffffff;
-    color: #004aca;
-    border: 1px solid #bbdefb;
+  .btn-outlined:hover { background: var(--background-main); }
+  .btn-contained {
+    background: var(--primary-color);
+    color: #ffffff;
+    border-color: var(--primary-color);
+    box-shadow: 0 1px 4px rgba(0,74,202,0.2);
   }
-  .btn-secondary:hover { background: #e3f2fd; }
-  .status {
+  .btn-contained:hover { background: var(--primary-dark); }
+  .status-bar {
     font-size: 13px;
-    color: #6b7280;
+    color: var(--text-secondary);
     display: flex;
     align-items: center;
-    justify-content: center;
     gap: 8px;
     padding: 12px 16px;
-    background: #f5f6fa;
+    background: var(--background-main);
+    border: 1px solid var(--border-color);
     border-radius: 8px;
   }
   .spinner {
-    display: inline-block;
-    width: 15px;
-    height: 15px;
-    border: 2px solid #bbdefb;
-    border-top-color: #004aca;
+    width: 14px; height: 14px;
+    border: 2px solid var(--border-color);
+    border-top-color: var(--primary-color);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
     flex-shrink: 0;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
-  .success { color: #4caf50; font-weight: 600; }
-  .error { color: #f44336; font-weight: 600; }
+  .success { color: var(--success); font-weight: 600; }
+  .error { color: var(--error); font-weight: 600; }
 </style>
 </head>
 <body>
+<div class="app-layout">
 
-<div class="header">
-  <div class="logo">
-    <div class="logo-icon">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-        <path d="M4 10L8 14L16 6" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
+  <!-- Sidebar — mirrors EtendoTool layout -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-title">ETENDO TOOL</div>
+      <div class="sidebar-subtitle">Control Center</div>
     </div>
-    <span class="logo-title">ETENDO TOOL</span>
-  </div>
-  <div class="logo-subtitle">Control Center</div>
-</div>
+    <div class="sidebar-divider"></div>
+    <nav class="sidebar-nav">
+      <div class="nav-item active">
+        <span class="nav-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/>
+            <path d="M15.54 8.46a5 5 0 010 7.07M8.46 8.46a5 5 0 000 7.07"/>
+          </svg>
+        </span>
+        <span class="nav-item-label">
+          <span>Setup</span>
+          <span class="nav-item-desc">GitHub authentication</span>
+        </span>
+      </div>
+    </nav>
+    <div class="sidebar-footer">Etendo Development Kit</div>
+  </aside>
 
-<div class="card">
-  <span class="step-label">Setup Required</span>
-  <h1>GitHub Authentication</h1>
-  <p class="subtitle">A GitHub token is needed to download Etendo packages.<br>Complete the steps below to continue.</p>
+  <!-- Main content -->
+  <main class="main-content">
+    <div class="auth-card">
+      <div class="section-title">GitHub Authentication</div>
+      <div class="section-subtitle">
+        A GitHub token is required to download Etendo packages from GitHub Packages.<br>
+        Complete the two steps below to authorize.
+      </div>
+      <div class="card-divider"></div>
 
-  <div class="divider"></div>
+      <div class="step-row">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-label">Open GitHub device activation</div>
+          <a class="url-link" href="https://github.com/login/device" target="_blank" rel="noopener">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            github.com/login/device
+          </a>
+        </div>
+      </div>
 
-  <p class="instruction">1. Open GitHub and enter this code:</p>
-  <a class="url-chip" href="https://github.com/login/device" target="_blank" rel="noopener">
-    github.com/login/device ↗
-  </a>
+      <div class="step-row">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-label">Enter this code on GitHub</div>
+          <div class="code-box" id="code">{{USER_CODE}}</div><br>
+          <div class="copied" id="copied-msg">&#10003; Copied to clipboard</div>
+          <div class="btn-row">
+            <button class="btn btn-outlined" onclick="copyCode()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              Copy code
+            </button>
+            <a class="btn btn-contained" href="https://github.com/login/device" target="_blank" rel="noopener">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              Open GitHub
+            </a>
+          </div>
+        </div>
+      </div>
 
-  <p class="instruction">2. Enter the code shown below:</p>
-  <div class="code-box" id="code">{{USER_CODE}}</div>
-  <div class="copied" id="copied-msg">&#10003; Copied to clipboard</div>
+      <div class="status-bar" id="status">
+        <span class="spinner"></span>
+        <span>Waiting for authorization...</span>
+      </div>
+    </div>
+  </main>
 
-  <div class="buttons">
-    <button class="btn btn-secondary" onclick="copyCode()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-      Copy code
-    </button>
-    <a class="btn btn-primary" href="https://github.com/login/device" target="_blank" rel="noopener">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg>
-      Open GitHub
-    </a>
-  </div>
-
-  <div class="status" id="status">
-    <span class="spinner"></span>
-    <span>Waiting for authorization...</span>
-  </div>
 </div>
 
 <script>
