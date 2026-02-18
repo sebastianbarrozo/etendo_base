@@ -5,6 +5,7 @@
 !gradlew
 !gradlew.bat
 !setup.sh
+!setup.java
 !gradle/**
 !gradle.properties
 !settings.gradle
